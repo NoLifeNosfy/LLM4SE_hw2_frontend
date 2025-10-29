@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
-import { login as loginApi, register as registerApi } from '../api/user';
+import { login as loginApi, register as registerApi, getProfile } from '../api/user';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
     token: localStorage.getItem('token') || null,
-    user: null,
+    user: null as { email: string; id: string } | null,
   }),
   getters: {
     isAuthenticated: (state) => !!state.token,
@@ -15,18 +15,27 @@ export const useUserStore = defineStore('user', {
         const response = await loginApi(email, password);
         this.token = response.data.access_token;
         localStorage.setItem('token', this.token);
-        // You might want to fetch user profile here
-      } catch (error) {
+        await this.getProfile();
+      } catch (error: any) {
         console.error('Login failed:', error);
-        throw error;
+        throw error.response?.data || error;
       }
     },
     async register(email, password) {
       try {
         await registerApi(email, password);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Registration failed:', error);
-        throw error;
+        throw error.response?.data || error;
+      }
+    },
+    async getProfile() {
+      if (!this.token) return;
+      try {
+        const response = await getProfile();
+        this.user = response.data;
+      } catch (error) {
+        console.error('Failed to fetch profile:', error);
       }
     },
     logout() {

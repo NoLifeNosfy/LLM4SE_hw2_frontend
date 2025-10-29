@@ -3,6 +3,7 @@ import Home from '../pages/Home.vue';
 import Planner from '../pages/Planner.vue';
 import Login from '../pages/Login.vue';
 import Register from '../pages/Register.vue';
+import AddTrip from '../pages/AddTrip.vue';
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: Register,
+  },
+  {
+    path: '/add-trip',
+    name: 'AddTrip',
+    component: AddTrip,
   },
 ];
 

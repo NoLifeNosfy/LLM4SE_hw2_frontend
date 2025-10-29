@@ -37,10 +37,9 @@ const handleRegister = async () => {
     await userStore.register(email.value, password.value);
     ElMessage.success('Register success');
     router.push('/login');
-  } catch (error) {
-    ElMessage.error('Register failed');
-    console.error('Register failed');
-    // You can show an error message to the user
+  } catch (error: any) {
+    ElMessage.error(error.detail || JSON.stringify(error));
+    console.error('Register failed:', error);
   }
 };
 </script>

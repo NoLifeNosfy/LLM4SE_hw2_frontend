@@ -77,29 +77,29 @@ Most endpoints are protected and require a JWT (JSON Web Token) to be passed in 
 
 *Authentication required for all endpoints.*
 
-#### `GET /trips`
+#### `GET /api/trips`
 
 *   **Description**: Retrieves all trips for the logged-in user.
 *   **Success Response (200 OK)**: A list of `Trip` objects.
 
-#### `POST /trips`
+#### `POST /api/trips`
 
 *   **Description**: Adds a new trip.
 *   **Request Body**: `TripCreate`
 *   **Success Response (201 Created)**: The newly created `Trip` object.
 
-#### `GET /trips/{trip_id}`
+#### `GET /api/trips/{trip_id}`
 
 *   **Description**: Retrieves a single trip by its ID.
 *   **Success Response (200 OK)**: A single `Trip` object.
 
-#### `PUT /trips/{trip_id}`
+#### `PUT /api/trips/{trip_id}`
 
 *   **Description**: Updates an existing trip.
 *   **Request Body**: `TripCreate`
 *   **Success Response (200 OK)**: The updated `Trip` object.
 
-#### `DELETE /trips/{trip_id}`
+#### `DELETE /api/trips/{trip_id}`
 
 *   **Description**: Deletes a trip.
 *   **Success Response**: `204 No Content`.
@@ -110,29 +110,29 @@ Most endpoints are protected and require a JWT (JSON Web Token) to be passed in 
 
 *Authentication required for all endpoints.*
 
-#### `GET /trips/{trip_id}/events`
+#### `GET /api/trips/{trip_id}/events`
 
 *   **Description**: Retrieves all events for a specific trip.
 *   **Success Response (200 OK)**: A list of `Event` objects.
 
-#### `POST /trips/{trip_id}/events`
+#### `POST /api/trips/{trip_id}/events`
 
 *   **Description**: Adds a new event to a trip.
 *   **Request Body**: `EventCreate`
 *   **Success Response (201 Created)**: The newly created `Event` object.
 
-#### `GET /events/{event_id}`
+#### `GET /api/events/{event_id}`
 
 *   **Description**: Retrieves a single event by its ID.
 *   **Success Response (200 OK)**: A single `Event` object.
 
-#### `PUT /events/{event_id}`
+#### `PUT /api/events/{event_id}`
 
 *   **Description**: Updates an event.
 *   **Request Body**: `EventCreate`
 *   **Success Response (200 OK)**: The updated `Event` object.
 
-#### `DELETE /events/{event_id}`
+#### `DELETE /api/events/{event_id}`
 
 *   **Description**: Deletes an event.
 *   **Success Response**: `204 No Content`.
@@ -143,29 +143,29 @@ Most endpoints are protected and require a JWT (JSON Web Token) to be passed in 
 
 *Authentication required for all endpoints.*
 
-#### `GET /trips/{trip_id}/routes`
+#### `GET /api/trips/{trip_id}/routes`
 
 *   **Description**: Retrieves all routes for a specific trip.
 *   **Success Response (200 OK)**: A list of `Route` objects.
 
-#### `POST /trips/{trip_id}/routes`
+#### `POST /api/trips/{trip_id}/routes`
 
 *   **Description**: Adds a new route to a trip.
 *   **Request Body**: `RouteCreate`
 *   **Success Response (201 Created)**: The newly created `Route` object.
 
-#### `GET /routes/{route_id}`
+#### `GET /api/routes/{route_id}`
 
 *   **Description**: Retrieves a single route by its ID.
 *   **Success Response (200 OK)**: A single `Route` object.
 
-#### `PUT /routes/{route_id}`
+#### `PUT /api/routes/{route_id}`
 
 *   **Description**: Updates a route.
 *   **Request Body**: `RouteCreate`
 *   **Success Response (200 OK)**: The updated `Route` object.
 
-#### `DELETE /routes/{route_id}`
+#### `DELETE /api/routes/{route_id}`
 
 *   **Description**: Deletes a route.
 *   **Success Response**: `204 No Content`.
@@ -176,24 +176,24 @@ Most endpoints are protected and require a JWT (JSON Web Token) to be passed in 
 
 *Authentication required for all endpoints.*
 
-#### `GET /trips/{trip_id}/expenses`
+#### `GET /api/trips/{trip_id}/expenses`
 
 *   **Description**: Retrieves all expenses for a specific trip.
 *   **Success Response (200 OK)**: A list of `Expense` objects.
 
-#### `POST /expenses`
+#### `POST /api/expenses`
 
 *   **Description**: Adds a new expense.
 *   **Request Body**: `ExpenseCreate`
 *   **Success Response (201 Created)**: The newly created `Expense` object.
 
-#### `PUT /expenses/{expense_id}`
+#### `PUT /api/expenses/{expense_id}`
 
 *   **Description**: Updates an expense.
 *   **Request Body**: `ExpenseCreate`
 *   **Success Response (200 OK)**: The updated `Expense` object.
 
-#### `DELETE /expenses/{expense_id}`
+#### `DELETE /api/expenses/{expense_id}`
 
 *   **Description**: Deletes an expense.
 *   **Success Response**: `204 No Content`.
@@ -204,31 +204,31 @@ Most endpoints are protected and require a JWT (JSON Web Token) to be passed in 
 
 *No authentication required.*
 
-#### `GET /locations`
+#### `GET /api/locations`
 
 *   **Description**: Searches for locations, optionally by name.
 *   **Query Parameters**:
     *   `name` (string, optional): Filter locations by name.
 *   **Success Response (200 OK)**: A list of `Location` objects.
 
-#### `POST /locations`
+#### `POST /api/locations`
 
 *   **Description**: Creates a new location.
 *   **Request Body**: `LocationCreate`
 *   **Success Response (201 Created)**: The newly created `Location` object.
 
-#### `GET /locations/{location_id}`
+#### `GET /api/locations/{location_id}`
 
 *   **Description**: Retrieves a single location by its ID.
 *   **Success Response (200 OK)**: A single `Location` object.
 
-#### `PUT /locations/{location_id}`
+#### `PUT /api/locations/{location_id}`
 
 *   **Description**: Updates a location.
 *   **Request Body**: `LocationCreate`
 *   **Success Response (200 OK)**: The updated `Location` object.
 
-#### `DELETE /locations/{location_id}`
+#### `DELETE /api/locations/{location_id}`
 
 *   **Description**: Deletes a location.
 *   **Success Response**: `204 No Content`.

@@ -26,6 +26,7 @@
 import { ref } from 'vue';
 import { useUserStore } from '../store/userStore';
 import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
 
 const email = ref('');
 const password = ref('');
@@ -39,10 +40,11 @@ const goToRegister = () => {
 const handleLogin = async () => {
   try {
     await userStore.login(email.value, password.value);
+    ElMessage.success('Login success');
     router.push('/planner');
-  } catch (error) {
+  } catch (error: any) {
+    ElMessage.error(error.detail || JSON.stringify(error));
     console.error('Login failed');
-    // You can show an error message to the user
   }
 };
 </script>
