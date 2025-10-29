@@ -1,12 +1,12 @@
 <template>
-  <div class="login-container">
-    <el-card class="login-card">
+  <div class="register-container">
+    <el-card class="register-card">
       <template #header>
         <div class="card-header">
-          <span>Login</span>
+          <span>Register</span>
         </div>
       </template>
-      <el-form @submit.prevent="handleLogin">
+      <el-form @submit.prevent="handleRegister">
         <el-form-item label="Email">
           <el-input v-model="email" type="email" placeholder="Enter your email"></el-input>
         </el-form-item>
@@ -14,8 +14,7 @@
           <el-input v-model="password" type="password" placeholder="Enter your password"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleLogin">Login</el-button>
-          <el-button @click="goToRegister">Register</el-button>
+          <el-button type="primary" @click="handleRegister">Register</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -26,29 +25,28 @@
 import { ref } from 'vue';
 import { useUserStore } from '../store/userStore';
 import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
 
 const email = ref('');
 const password = ref('');
 const userStore = useUserStore();
 const router = useRouter();
 
-const goToRegister = () => {
-  router.push('/register');
-};
-
-const handleLogin = async () => {
+const handleRegister = async () => {
   try {
-    await userStore.login(email.value, password.value);
-    router.push('/planner');
+    await userStore.register(email.value, password.value);
+    ElMessage.success('Register success');
+    router.push('/login');
   } catch (error) {
-    console.error('Login failed');
+    ElMessage.error('Register failed');
+    console.error('Register failed');
     // You can show an error message to the user
   }
 };
 </script>
 
 <style scoped>
-.login-container {
+.register-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -56,7 +54,7 @@ const handleLogin = async () => {
   background-color: #f5f7fa;
 }
 
-.login-card {
+.register-card {
   width: 400px;
 }
 

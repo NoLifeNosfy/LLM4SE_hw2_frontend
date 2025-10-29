@@ -6,6 +6,9 @@
       <el-button type="primary" size="large" @click="goToPlanner">
         Start Planning
       </el-button>
+      <el-button size="large" @click="goToLogin">
+        Login
+      </el-button>
     </header>
   </div>
 </template>
@@ -17,6 +20,10 @@ const router = useRouter();
 
 const goToPlanner = () => {
   router.push('/planner');
+};
+
+const goToLogin = () => {
+  router.push('/login');
 };
 </script>
 
