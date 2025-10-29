@@ -4,6 +4,7 @@ import Planner from '../pages/Planner.vue';
 import Login from '../pages/Login.vue';
 import Register from '../pages/Register.vue';
 import AddTrip from '../pages/AddTrip.vue';
+import TripDetail from '../pages/TripDetail.vue';
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
     path: '/add-trip',
     name: 'AddTrip',
     component: AddTrip,
+  },
+  {
+    path: '/trips/:id',
+    name: 'TripDetail',
+    component: TripDetail,
   },
 ];
 
