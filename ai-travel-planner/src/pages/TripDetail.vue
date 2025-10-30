@@ -2,17 +2,6 @@
   <div class="trip-detail-container" v-if="trip">
     <div class="trip-header">
       <h1>{{ trip.title }}</h1>
-      <el-dropdown>
-        <span class="el-dropdown-link">
-          <el-icon class="el-icon--right"><arrow-down /></el-icon>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item>Add Day</el-dropdown-item>
-            <el-dropdown-item>Delete Day</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
     </div>
     <p><strong>From:</strong> {{ trip.start_date }}</p>
     <p><strong>To:</strong> {{ trip.end_date }}</p>
@@ -20,7 +9,7 @@
 
     <h2>Events</h2>
     <div class="toolbar">
-      <el-button type="primary" :icon="Plus">Add Event</el-button>
+      <el-button type="primary" :icon="Plus">Add Day</el-button>
     </div>
     <div class="days-container">
       <DayCard v-for="day in days" :key="day.dayIndex" :day="day" />

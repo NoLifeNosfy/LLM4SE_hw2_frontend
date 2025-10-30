@@ -5,6 +5,19 @@
         <span class="day-number">Day {{ day.dayIndex }}</span>
       </div>
       <div v-if="isFolded" class="folded-summary">{{ foldedSummary }}</div>
+      <div class="day-actions">
+        <el-dropdown>
+          <span class="el-dropdown-link" @click.stop>
+            <el-icon class="el-icon--right"><more-filled /></el-icon>
+          </span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item>Add Event</el-dropdown-item>
+              <el-dropdown-item>Delete This Day</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
     </div>
     <div v-if="!isFolded" class="events-container">
       <template v-for="(event, index) in day.events" :key="event.id">
@@ -21,6 +34,7 @@ import EventCard from './EventCard.vue';
 import RouteCard from './RouteCard.vue';
 import type { Event } from '../api/event';
 import type { Route } from '../api/route';
+import { MoreFilled } from '@element-plus/icons-vue';
 
 const props = defineProps<{ 
   day: { dayIndex: number; events: Event[]; routes: Route[] };
@@ -92,6 +106,11 @@ const findRouteBetween = (fromEvent: Event, toEvent: Event) => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-grow: 1;
+}
+
+.day-actions {
+  margin-left: auto;
 }
 
 .events-container {
