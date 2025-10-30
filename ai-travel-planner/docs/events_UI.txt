@@ -23,6 +23,6 @@ now we design the events list UI. Here's my requirement.
 
 11. A route is the transportation between 2 events. User can add a route between 2 adjacent events. 
 
-12. The UI of the route is a downward arrow. On the right of the arrow, shows the duration, distance, mode of the route.
+12. The UI of the route is a downward arrow, the arrow shows the events from and to. On the right of the arrow, shows the duration, distance, mode of the route.
 
 13. User can edit, delete a route, or ask backend for map navigation apis. So a route shold also have a overflow menu.

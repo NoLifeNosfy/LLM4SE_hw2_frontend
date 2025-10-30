@@ -8,8 +8,13 @@ export const useEventStore = defineStore('event', {
   }),
   actions: {
     async fetchEvents(tripId: string) {
-      const response = await getEvents(tripId);
-      this.events = response.data;
+      try {
+        const response = await getEvents(tripId);
+        console.log('Fetched events:', response.data);
+        this.events = response.data;
+      } catch (error) {
+        console.error('Failed to fetch events:', error);
+      }
     },
     async addEvent(tripId: string, event: EventCreate) {
       const response = await createEvent(tripId, event);
