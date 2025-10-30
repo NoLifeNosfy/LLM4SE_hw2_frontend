@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { getTrips, addTrip, deleteTrip } from '../api/trip';
+import { getTrips, addTrip, deleteTrip, getTrip } from '../api/trip';
 import type { TripCreate } from '../api/trip';
 
 export interface Trip {
@@ -45,6 +45,21 @@ export const useTripStore = defineStore('trip', {
         }
       } catch (error: any) {
         console.error('Failed to delete trips:', error);
+        throw error.response?.data || error;
+      }
+    },
+    async fetchTrip(id: string) {
+      try {
+        const response = await getTrip(id);
+        const trip = response.data;
+        const index = this.trips.findIndex(t => t.id === id);
+        if (index !== -1) {
+          this.trips[index] = trip;
+        } else {
+          this.trips.push(trip);
+        }
+      } catch (error: any) {
+        console.error('Failed to fetch trip:', error);
         throw error.response?.data || error;
       }
     },

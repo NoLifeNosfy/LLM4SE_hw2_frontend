@@ -1,0 +1,28 @@
+now we design the events list UI. Here's my requirement.
+1. The hierarchy is: Main list -> Days list -> events list
+
+2. Main list contains mutiple days. Every Day contians mutiple events. Between 2 events, there can be a route.
+
+3. Main list is the outermost layer. The UI is a rectangle, On the top left shows the trip.title. On the top right, there is a Overflow Menu, inside the menu there is 2 options: add a day, delete a day. Under the trip tile, is the list of days.
+
+4. UI shows a day in a big rounded rectangle。 On top left of the rectangle, there is a big circle, and text in the circle: "day 1". The day card contains the events of the day.
+
+5. Every Day are in different backgroud color, and the color of the event in the day should match the color theme of the day. 
+   For example: Day1: Blue  {event1: baby blue, event2: sky blue, event3: dark blue}
+                Day2: Green {event4: light green, event5: pea green}
+
+6. User can fold or unfold a day. When user folds a day, the day card should only show the circle, and a single string, concatenated by the titles of the events in the day.
+
+7. The UI of a event contains 3 parts. From left to right, first part shows the start time and end time of the event. Arrange the 2 times vertically. The second part is a small circle, the text inside the circle, is the first character of the event's title. This is the indicator of the event.  The 3rd part is a string, this shows the location name of the event. These 3 parts makes the header of the event.
+
+8. The body of the event is folded by default. When user unfold the event, the body will show the detail fields of the event.
+
+9. User can edit the details of the event. There should be a Overflow menu for all events, including options like "edit event", "delete event".
+
+10. Backend api do not return days. It only returns a list of events, ordered by event.day_index, event.start_time. So the day UI is all computed by frontend. 
+
+11. A route is the transportation between 2 events. User can add a route between 2 adjacent events. 
+
+12. The UI of the route is a downward arrow. On the right of the arrow, shows the duration, distance, mode of the route.
+
+13. User can edit, delete a route, or ask backend for map navigation apis. So a route shold also have a overflow menu.

@@ -19,3 +19,7 @@ export const addTrip = (trip: TripCreate) => {
 export const deleteTrip = (id: string) => {
   return apiClient.delete(`api/trips/${id}`);
 };
+
+export const getTrip = (id: string) => {
+  return apiClient.get(`api/trips/${id}`);
+};
