@@ -9,7 +9,7 @@
 
     <h2>Events</h2>
     <div class="toolbar">
-      <el-button type="primary" :icon="Plus">Add Day</el-button>
+      <el-button type="primary" :icon="Plus" @click="handleAddDay">Add Day</el-button>
     </div>
     <div class="days-container">
       <DayCard v-for="day in days" :key="day.dayIndex" :day="day" />
@@ -67,6 +67,10 @@ const days = computed(() => {
 
   return Object.values(grouped).sort((a, b) => a.dayIndex - b.dayIndex);
 });
+
+const handleAddDay = () => {
+  eventStore.addDay(tripId);
+};
 
 onMounted(async () => {
   await tripStore.fetchTrip(tripId);

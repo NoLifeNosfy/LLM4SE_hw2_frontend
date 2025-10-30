@@ -10,7 +10,6 @@ export const useEventStore = defineStore('event', {
     async fetchEvents(tripId: string) {
       try {
         const response = await getEvents(tripId);
-        console.log('Fetched events:', response.data);
         this.events = response.data;
       } catch (error) {
         console.error('Failed to fetch events:', error);
@@ -30,6 +29,26 @@ export const useEventStore = defineStore('event', {
     async removeEvent(eventId: string) {
       await deleteEvent(eventId);
       this.events = this.events.filter(e => e.id !== eventId);
+    },
+    async addDay(tripId: string) {
+      const maxDayIndex = this.events.reduce((max, e) => Math.max(max, e.day_index), 0);
+      const newEvent: EventCreate = {
+        title: '新事件',
+        start_time: '00:00',
+        end_time: '00:00',
+        type: 'activity',
+        budget: 0,
+        details: null,
+        day_index: maxDayIndex + 1,
+        location_id: null
+      };
+      await this.addEvent(tripId, newEvent);
+    },
+    async removeDay(dayIndex: number) {
+      const eventsToDelete = this.events.filter(e => e.day_index === dayIndex);
+      for (const event of eventsToDelete) {
+        await this.removeEvent(event.id);
+      }
     },
   },
 });

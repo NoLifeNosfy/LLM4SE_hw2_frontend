@@ -13,7 +13,7 @@
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item>Add Event</el-dropdown-item>
-              <el-dropdown-item>Delete This Day</el-dropdown-item>
+              <el-dropdown-item @click="handleDeleteDay">Delete This Day</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -35,12 +35,15 @@ import RouteCard from './RouteCard.vue';
 import type { Event } from '../api/event';
 import type { Route } from '../api/route';
 import { MoreFilled } from '@element-plus/icons-vue';
+import { useEventStore } from '../store/eventStore';
+import { ElMessageBox } from 'element-plus';
 
 const props = defineProps<{ 
   day: { dayIndex: number; events: Event[]; routes: Route[] };
 }>();
 
 const isFolded = ref(false);
+const eventStore = useEventStore();
 
 const dayColors = ['#E3F2FD', '#E8F5E9', '#FFFDE7', '#F3E5F5', '#FBE9E7'];
 const eventColorShades = [
@@ -68,6 +71,19 @@ const foldedSummary = computed(() => {
 
 const findRouteBetween = (fromEvent: Event, toEvent: Event) => {
   return props.day.routes.find(r => r.from_event_id === fromEvent.id && r.to_event_id === toEvent.id);
+};
+
+const handleDeleteDay = async () => {
+  try {
+    await ElMessageBox.confirm('This will permanently delete the day and all its events. Continue?', 'Warning', {
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    });
+    await eventStore.removeDay(props.day.dayIndex);
+  } catch (error) {
+    // catch cancellation
+  }
 };
 
 </script>

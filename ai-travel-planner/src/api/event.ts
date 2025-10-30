@@ -9,7 +9,7 @@ export interface Event {
     budget: number;
     details: any;
     day_index: number;
-    location_id: string;
+    location_id: string | null;
     id: string;
     trip_id: string;
     expense: number;
@@ -24,7 +24,7 @@ export interface EventCreate {
     budget: number;
     details: any;
     day_index: number;
-    location_id: string;
+    location_id: string | null;
 }
 
 export const getEvents = (tripId: string) => {
