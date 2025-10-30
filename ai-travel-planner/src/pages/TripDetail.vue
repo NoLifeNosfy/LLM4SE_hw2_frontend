@@ -12,8 +12,20 @@
       <el-button type="primary" :icon="Plus" @click="handleAddDay">Add Day</el-button>
     </div>
     <div class="days-container">
-      <DayCard v-for="day in days" :key="day.dayIndex" :day="day" />
+      <DayCard 
+        v-for="day in days" 
+        :key="day.dayIndex" 
+        :day="day" 
+        @add-event="openAddEventDialog"
+        @edit-event="openEditEventDialog"
+      />
     </div>
+    <AddEventForm 
+      v-model="isDialogVisible" 
+      :event="editingEvent" 
+      :day-index="currentDayIndex" 
+      @save="handleSaveEvent" 
+    />
   </div>
 </template>
 
@@ -26,7 +38,8 @@ import { useRouteStore } from '../store/routeStore';
 import { useLocationStore } from '../store/locationStore';
 import { Plus, ArrowDown } from '@element-plus/icons-vue';
 import DayCard from '../components/DayCard.vue';
-import type { Event } from '../api/event';
+import AddEventForm from '../components/AddEventForm.vue';
+import type { Event, EventCreate } from '../api/event';
 import type { Route } from '../api/route';
 
 const route = useRoute();
@@ -36,6 +49,10 @@ const routeStore = useRouteStore();
 const locationStore = useLocationStore();
 
 const tripId = route.params.id as string;
+
+const isDialogVisible = ref(false);
+const editingEvent = ref<Event | undefined>(undefined);
+const currentDayIndex = ref<number | undefined>(undefined);
 
 const trip = computed(() => tripStore.trips.find(t => t.id === tripId));
 const events = computed(() => eventStore.events);
@@ -55,21 +72,43 @@ const days = computed(() => {
     return acc;
   }, {} as Record<number, { dayIndex: number; events: Event[]; routes: Route[] }>);
 
-  routes.value.forEach(route => {
-    const fromEvent = events.value.find(e => e.id === route.from_event_id);
-    if (fromEvent) {
-      const dayIndex = fromEvent.day_index;
-      if (grouped[dayIndex]) {
-        grouped[dayIndex].routes.push(route);
+  if (routes.value) {
+    routes.value.forEach(route => {
+      const fromEvent = events.value.find(e => e.id === route.from_event_id);
+      if (fromEvent) {
+        const dayIndex = fromEvent.day_index;
+        if (grouped[dayIndex]) {
+          grouped[dayIndex].routes.push(route);
+        }
       }
-    }
-  });
+    });
+  }
 
   return Object.values(grouped).sort((a, b) => a.dayIndex - b.dayIndex);
 });
 
 const handleAddDay = () => {
   eventStore.addDay(tripId);
+};
+
+const openAddEventDialog = (dayIndex: number) => {
+  editingEvent.value = undefined;
+  currentDayIndex.value = dayIndex;
+  isDialogVisible.value = true;
+};
+
+const openEditEventDialog = (event: Event) => {
+  editingEvent.value = event;
+  currentDayIndex.value = event.day_index;
+  isDialogVisible.value = true;
+};
+
+const handleSaveEvent = async (eventData: EventCreate) => {
+  if (editingEvent.value) {
+    await eventStore.editEvent(editingEvent.value.id, eventData);
+  } else {
+    await eventStore.addEvent(tripId, eventData);
+  }
 };
 
 onMounted(async () => {

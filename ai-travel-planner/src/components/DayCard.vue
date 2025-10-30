@@ -12,7 +12,7 @@
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item>Add Event</el-dropdown-item>
+              <el-dropdown-item @click="handleAddEvent">Add Event</el-dropdown-item>
               <el-dropdown-item @click="handleDeleteDay">Delete This Day</el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -21,7 +21,7 @@
     </div>
     <div v-if="!isFolded" class="events-container">
       <template v-for="(event, index) in day.events" :key="event.id">
-        <EventCard :event="event" :event-color="getEventColor(index)" />
+        <EventCard :event="event" :event-color="getEventColor(index)" @edit-event="emit('edit-event', event)" />
         <RouteCard v-if="index < day.events.length - 1" :route="findRouteBetween(event, day.events[index + 1])" />
       </template>
     </div>
@@ -41,6 +41,8 @@ import { ElMessageBox } from 'element-plus';
 const props = defineProps<{ 
   day: { dayIndex: number; events: Event[]; routes: Route[] };
 }>();
+
+const emit = defineEmits(['add-event', 'edit-event']);
 
 const isFolded = ref(false);
 const eventStore = useEventStore();
@@ -71,6 +73,10 @@ const foldedSummary = computed(() => {
 
 const findRouteBetween = (fromEvent: Event, toEvent: Event) => {
   return props.day.routes.find(r => r.from_event_id === fromEvent.id && r.to_event_id === toEvent.id);
+};
+
+const handleAddEvent = () => {
+  emit('add-event', props.day.dayIndex);
 };
 
 const handleDeleteDay = async () => {

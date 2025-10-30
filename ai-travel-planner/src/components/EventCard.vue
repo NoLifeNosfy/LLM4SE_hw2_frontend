@@ -15,8 +15,8 @@
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item>Edit Event</el-dropdown-item>
-            <el-dropdown-item>Delete Event</el-dropdown-item>
+            <el-dropdown-item @click="emit('edit-event', event)">Edit Event</el-dropdown-item>
+            <el-dropdown-item @click="handleDeleteEvent">Delete Event</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -34,15 +34,20 @@
 import { ref, computed } from 'vue';
 import type { Event } from '../api/event';
 import { useLocationStore } from '../store/locationStore';
+import { useEventStore } from '../store/eventStore';
 import { MoreFilled } from '@element-plus/icons-vue';
+import { ElMessageBox } from 'element-plus';
 
 const props = defineProps<{ 
   event: Event;
   eventColor: string;
 }>();
 
+const emit = defineEmits(['edit-event']);
+
 const isFolded = ref(true);
 const locationStore = useLocationStore();
+const eventStore = useEventStore();
 
 const locationName = computed(() => {
   const location = locationStore.getLocationById(props.event.location_id);
@@ -60,6 +65,18 @@ const formatTime = (time: string) => {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
+const handleDeleteEvent = async () => {
+  try {
+    await ElMessageBox.confirm('This will permanently delete the event. Continue?', 'Warning', {
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    });
+    await eventStore.removeEvent(props.event.id);
+  } catch (error) {
+    // catch cancellation
+  }
+};
 </script>
 
 <style scoped>

@@ -16,11 +16,19 @@ export const useEventStore = defineStore('event', {
       }
     },
     async addEvent(tripId: string, event: EventCreate) {
-      const response = await createEvent(tripId, event);
+      const data = {
+        ...event,
+        details: JSON.stringify(event.details),
+      };
+      const response = await createEvent(tripId, data as any);
       this.events.push(response.data);
     },
     async editEvent(eventId: string, event: EventCreate) {
-      const response = await updateEvent(eventId, event);
+      const data = {
+        ...event,
+        details: JSON.stringify(event.details),
+      };
+      const response = await updateEvent(eventId, data as any);
       const index = this.events.findIndex(e => e.id === eventId);
       if (index !== -1) {
         this.events[index] = response.data;
