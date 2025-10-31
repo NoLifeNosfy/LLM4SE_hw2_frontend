@@ -363,9 +363,13 @@ Most endpoints are protected and require a JWT (JSON Web Token) to be passed in 
     "distance": "integer",
     "duration": "integer",
     "budget": "float",
-    "geometry": {},
-    "details": {},
-    "id": "uuid",
+    "geometry": [
+        {
+            "lng": "float",
+            "lat": "float"
+        }
+    ],
+
     "trip_id": "uuid"
 }
 ```
@@ -379,7 +383,12 @@ Most endpoints are protected and require a JWT (JSON Web Token) to be passed in 
     "distance": "integer",
     "duration": "integer",
     "budget": "float",
-    "geometry": {},
+    "geometry": [
+        {
+            "lng": "float",
+            "lat": "float"
+        }
+    ],
     "details": {}
 }
 ```

@@ -10,7 +10,6 @@
   </div>
 </template>
 
-
 <style scoped>
 /* 外层容器：负责居中显示 */
 .map-container {
