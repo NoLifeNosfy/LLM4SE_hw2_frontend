@@ -5,6 +5,7 @@ import Login from '../pages/Login.vue';
 import Register from '../pages/Register.vue';
 import AddTrip from '../pages/AddTrip.vue';
 import TripDetail from '../pages/TripDetail.vue';
+import Baidumap from '../pages/Baidumap.vue';
 
 const routes = [
   {
@@ -36,6 +37,11 @@ const routes = [
     path: '/trips/:id',
     name: 'TripDetail',
     component: TripDetail,
+  },
+  {
+    path: '/baidumap',
+    name: 'Baidumap',
+    component: Baidumap,
   },
 ];
 
