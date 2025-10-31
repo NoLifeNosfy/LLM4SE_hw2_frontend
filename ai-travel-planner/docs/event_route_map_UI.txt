@@ -1,0 +1,8 @@
+1. the map shows the location of each event on the map, in form of a point corverd on the map. The color of the location point is the same as the color of the corresponding event card .
+2. If the event is the first event of the day, or last event of a day. The corresponding point should be highlighted.
+3. The map show the routes on the map, in form of a polyline with arrows. The color of the polyline should be distinct with the points from and to.
+4. When user clicks a event on the left area. The map should be centered to the corresponding location, and highlight the point by setting it larger.
+5. When user clicks a route on the left area, the map should be centered and zoomed to show the whole parts of the route's polyline. And highlight the polyline by setting it thicker.
+6. (Optional): user can click any area of the map, and create a location on the corresponding longtitude and latitude.
+7. (Optional): User can click any area of the map, and create a event on the location.
+

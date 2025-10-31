@@ -5,7 +5,7 @@ import Login from '../pages/Login.vue';
 import Register from '../pages/Register.vue';
 import AddTrip from '../pages/AddTrip.vue';
 import TripDetail from '../pages/TripDetail.vue';
-import Baidumap from '../pages/Baidumap.vue';
+import Baidumap from '../pages/Baidumap_example.vue';
 
 const routes = [
   {

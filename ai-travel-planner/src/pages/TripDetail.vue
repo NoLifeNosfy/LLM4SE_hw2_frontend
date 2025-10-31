@@ -1,26 +1,33 @@
 <template>
   <div class="trip-detail-container" v-if="trip">
-    <div class="trip-header">
-      <h1>{{ trip.title }}</h1>
-    </div>
-    <p><strong>From:</strong> {{ trip.start_date }}</p>
-    <p><strong>To:</strong> {{ trip.end_date }}</p>
-    <p><strong>Budget:</strong> {{ trip.total_budget }} {{ trip.currency }}</p>
+    <div class="trip-content-wrapper">
+      <div class="left-panel">
+        <div class="trip-header">
+          <h1>{{ trip.title }}</h1>
+        </div>
+        <p><strong>From:</strong> {{ trip.start_date }}</p>
+        <p><strong>To:</strong> {{ trip.end_date }}</p>
+        <p><strong>Budget:</strong> {{ trip.total_budget }} {{ trip.currency }}</p>
 
-    <h2>Events</h2>
-    <div class="toolbar">
-      <el-button type="primary" :icon="Plus" @click="handleAddDay">Add Day</el-button>
-    </div>
-    <div class="days-container">
-      <DayCard 
-        v-for="day in days" 
-        :key="day.dayIndex" 
-        :day="day" 
-        @add-event="openAddEventDialog"
-        @edit-event="openEditEventDialog"
-        @add-route="openAddRouteDialog"
-        @edit-route="openEditRouteDialog"
-      />
+        <h2>Events</h2>
+        <div class="toolbar">
+          <el-button type="primary" :icon="Plus" @click="handleAddDay">Add Day</el-button>
+        </div>
+        <div class="days-container">
+          <DayCard 
+            v-for="day in days" 
+            :key="day.dayIndex" 
+            :day="day" 
+            @add-event="openAddEventDialog"
+            @edit-event="openEditEventDialog"
+            @add-route="openAddRouteDialog"
+            @edit-route="openEditRouteDialog"
+          />
+        </div>
+      </div>
+      <div class="right-panel">
+        <MapContainer />
+      </div>
     </div>
     <AddEventForm 
       v-model="isDialogVisible" 
@@ -51,6 +58,7 @@ import AddEventForm from '../components/AddEventForm.vue';
 import AddRouteForm from '../components/AddRouteForm.vue';
 import type { Event, EventCreate } from '../api/event';
 import type { Route, RouteCreate } from '../api/route';
+import MapContainer from '../components/Map/MapContainer.vue';
 
 const route = useRoute();
 const tripStore = useTripStore();
@@ -159,6 +167,44 @@ onMounted(async () => {
 <style scoped>
 .trip-detail-container {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full viewport height */
+}
+
+.trip-content-wrapper {
+  display: flex;
+  flex: 1; /* Take remaining space */
+  gap: 20px; /* Space between columns */
+  overflow: hidden; /* Hide overflow if content is too large */
+}
+
+.left-panel {
+  flex: 1; /* Takes 1 part of the available space */
+  overflow-y: auto; /* Scroll for content if it overflows */
+  padding-right: 10px; /* Some padding for scrollbar */
+}
+
+.right-panel {
+  flex: 2; /* Takes 2 parts of the available space, making it wider */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f2f5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.map-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #606266;
+  font-size: 1.5rem;
+  border: 2px dashed #dcdfe6;
+  border-radius: 8px;
 }
 
 .trip-header {
