@@ -3,10 +3,8 @@ import api from './index';
 export interface Location {
     name: string;
     address: string;
-    geom: {
-        type: string;
-        coordinates: [number, number];
-    };
+    lng: number;
+    lat: number;
     place_id: string;
     type: string;
     metadata: any;

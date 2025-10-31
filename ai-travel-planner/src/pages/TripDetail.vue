@@ -26,7 +26,8 @@
         </div>
       </div>
       <div class="right-panel">
-        <MapContainer />
+        <MapContainer v-if="isDataLoaded" :events="events" :locations="locations" />
+        <div v-else class="map-placeholder">Loading Map...</div>
       </div>
     </div>
     <AddEventForm 
@@ -80,6 +81,9 @@ const toEventId = ref<string | undefined>(undefined);
 const trip = computed(() => tripStore.trips.find(t => t.id === tripId));
 const events = computed(() => eventStore.events);
 const routes = computed(() => routeStore.routes);
+const locations = computed(() => locationStore.locations);
+
+const isDataLoaded = computed(() => events.value.length > 0 && locations.value.length > 0);
 
 const days = computed(() => {
   const grouped = events.value.reduce((acc, event) => {
