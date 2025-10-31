@@ -8,7 +8,7 @@ export interface Route {
     duration: number;
     budget: number;
     geometry: any;
-    details: any;
+    details: string;
     id: string;
     trip_id: string;
 }
@@ -21,7 +21,7 @@ export interface RouteCreate {
     duration: number;
     budget: number;
     geometry: any;
-    details: any;
+    details: string;
 }
 
 export const getRoutes = (tripId: string) => {

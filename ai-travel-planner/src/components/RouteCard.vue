@@ -13,38 +13,57 @@
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item>Edit Route</el-dropdown-item>
-            <el-dropdown-item>Delete Route</el-dropdown-item>
+            <el-dropdown-item @click="emit('edit-route')">Edit Route</el-dropdown-item>
+            <el-dropdown-item @click="handleDeleteRoute">Delete Route</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
     </div>
     <div v-else class="add-route">
-      <el-button type="dashed" :icon="Plus" @click="handleAddRoute">Add Route</el-button>
+      <el-button type="dashed" :icon="Plus" @click="emit('add-route')">Add Route</el-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Route } from '../api/route';
+import { useRouteStore } from '../store/routeStore';
 import { MoreFilled, Plus } from '@element-plus/icons-vue';
+import { ElMessageBox } from 'element-plus';
 
 const props = defineProps<{ 
   route?: Route;
 }>();
 
+const emit = defineEmits(['add-route', 'edit-route']);
+
+const routeStore = useRouteStore();
+
 const formatDuration = (duration: number) => {
+  if (!duration) return '0h 0m';
   const hours = Math.floor(duration / 3600);
   const minutes = Math.floor((duration % 3600) / 60);
   return `${hours}h ${minutes}m`;
 };
 
 const formatDistance = (distance: number) => {
+  if (!distance) return '0.0 km';
   return `${(distance / 1000).toFixed(1)} km`;
 };
 
-const handleAddRoute = () => {
-  // TODO: Implement add route functionality
+const handleDeleteRoute = async () => {
+  if (props.route) {
+    try {
+      await ElMessageBox.confirm('This will permanently delete the route. Continue?', 'Warning', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning',
+      });
+      await routeStore.removeRoute(props.route.id);
+    } catch (error) {
+      // catch cancellation
+    }
+  }
 };
 
 </script>

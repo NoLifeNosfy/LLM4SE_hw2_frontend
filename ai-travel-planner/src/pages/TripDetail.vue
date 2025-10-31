@@ -18,6 +18,8 @@
         :day="day" 
         @add-event="openAddEventDialog"
         @edit-event="openEditEventDialog"
+        @add-route="openAddRouteDialog"
+        @edit-route="openEditRouteDialog"
       />
     </div>
     <AddEventForm 
@@ -25,6 +27,13 @@
       :event="editingEvent" 
       :day-index="currentDayIndex" 
       @save="handleSaveEvent" 
+    />
+    <AddRouteForm
+      v-model="isRouteDialogVisible"
+      :route="editingRoute"
+      :from-event-id="fromEventId"
+      :to-event-id="toEventId"
+      @save="handleSaveRoute"
     />
   </div>
 </template>
@@ -39,8 +48,9 @@ import { useLocationStore } from '../store/locationStore';
 import { Plus, ArrowDown } from '@element-plus/icons-vue';
 import DayCard from '../components/DayCard.vue';
 import AddEventForm from '../components/AddEventForm.vue';
+import AddRouteForm from '../components/AddRouteForm.vue';
 import type { Event, EventCreate } from '../api/event';
-import type { Route } from '../api/route';
+import type { Route, RouteCreate } from '../api/route';
 
 const route = useRoute();
 const tripStore = useTripStore();
@@ -53,6 +63,11 @@ const tripId = route.params.id as string;
 const isDialogVisible = ref(false);
 const editingEvent = ref<Event | undefined>(undefined);
 const currentDayIndex = ref<number | undefined>(undefined);
+
+const isRouteDialogVisible = ref(false);
+const editingRoute = ref<Route | undefined>(undefined);
+const fromEventId = ref<string | undefined>(undefined);
+const toEventId = ref<string | undefined>(undefined);
 
 const trip = computed(() => tripStore.trips.find(t => t.id === tripId));
 const events = computed(() => eventStore.events);
@@ -108,6 +123,28 @@ const handleSaveEvent = async (eventData: EventCreate) => {
     await eventStore.editEvent(editingEvent.value.id, eventData);
   } else {
     await eventStore.addEvent(tripId, eventData);
+  }
+};
+
+const openAddRouteDialog = (data: { fromEventId: string; toEventId: string }) => {
+  editingRoute.value = undefined;
+  fromEventId.value = data.fromEventId;
+  toEventId.value = data.toEventId;
+  isRouteDialogVisible.value = true;
+};
+
+const openEditRouteDialog = (route: Route) => {
+  editingRoute.value = route;
+  fromEventId.value = route.from_event_id;
+  toEventId.value = route.to_event_id;
+  isRouteDialogVisible.value = true;
+};
+
+const handleSaveRoute = async (routeData: RouteCreate) => {
+  if (editingRoute.value) {
+    await routeStore.editRoute(editingRoute.value.id, routeData);
+  } else {
+    await routeStore.addRoute(tripId, routeData);
   }
 };
 
