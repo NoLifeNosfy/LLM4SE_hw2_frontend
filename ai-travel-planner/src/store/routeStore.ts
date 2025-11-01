@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { getRoutes, createRoute, updateRoute, deleteRoute } from '../api/route';
+import { getRoutes, createRoute, updateRoute, deleteRoute, generateRoute } from '../api/route';
 import type { Route, RouteCreate } from '../api/route';
 
 export const useRouteStore = defineStore('route', {
@@ -30,6 +30,10 @@ export const useRouteStore = defineStore('route', {
     async removeRoute(routeId: string) {
       await deleteRoute(routeId);
       this.routes = this.routes.filter(r => r.id !== routeId);
+    },
+    async generateRoute(tripId: string, fromEventId: string, toEventId: string, mode: string) {
+      const response = await generateRoute(tripId, fromEventId, toEventId, mode);
+      this.routes.push(response.data);
     },
   },
 });

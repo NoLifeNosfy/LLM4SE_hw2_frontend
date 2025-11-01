@@ -21,11 +21,16 @@
     </div>
     <div v-else class="add-route">
       <el-button type="dashed" :icon="Plus" @click="emit('add-route')">Add Route</el-button>
+      <el-select v-model="selectedMode" placeholder="Select mode" style="width: 120px; margin-left: 10px;">
+        <el-option v-for="mode in modes" :key="mode" :label="mode" :value="mode"></el-option>
+      </el-select>
+      <el-button type="primary" @click="handleGenerateRoute" :loading="isGenerating">Generate Route</el-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import type { Route } from '../api/route';
 import { useRouteStore } from '../store/routeStore';
 import { MoreFilled, Plus } from '@element-plus/icons-vue';
@@ -33,11 +38,14 @@ import { ElMessageBox } from 'element-plus';
 
 const props = defineProps<{ 
   route?: Route;
+  isGenerating?: boolean;
 }>();
 
-const emit = defineEmits(['add-route', 'edit-route', 'route-click']);
+const emit = defineEmits(['add-route', 'edit-route', 'route-click', 'generate-route']);
 
 const routeStore = useRouteStore();
+const selectedMode = ref('driving');
+const modes = ["driving", "riding", "walking", "transit"];
 
 const formatDuration = (duration: number) => {
   if (!duration) return '0h 0m';
@@ -72,6 +80,10 @@ const handleRouteClick = () => {
   }
 };
 
+const handleGenerateRoute = () => {
+  emit('generate-route', selectedMode.value);
+};
+
 </script>
 
 <style scoped>
@@ -104,9 +116,11 @@ const handleRouteClick = () => {
 
 .add-route {
   width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 
 .el-button--dashed {
-    width: 100%;
+    width: 48%;
 }
 </style>

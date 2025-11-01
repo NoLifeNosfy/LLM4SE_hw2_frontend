@@ -24,6 +24,8 @@
             @edit-route="openEditRouteDialog"
             @event-click="handleEventClick"
             @route-click="handleRouteClick"
+            @generate-route="handleGenerateRoute"
+            :is-generating-route="isGeneratingRoute"
           />
         </div>
       </div>
@@ -85,6 +87,7 @@ const isRouteDialogVisible = ref(false);
 const editingRoute = ref<Route | undefined>(undefined);
 const fromEventId = ref<string | undefined>(undefined);
 const toEventId = ref<string | undefined>(undefined);
+const isGeneratingRoute = ref(false);
 
 const mapContainerRef = ref<InstanceType<typeof MapContainer> | null>(null);
 
@@ -167,6 +170,15 @@ const handleSaveRoute = async (routeData: RouteCreate) => {
     await routeStore.editRoute(editingRoute.value.id, routeData);
   } else {
     await routeStore.addRoute(tripId, routeData);
+  }
+};
+
+const handleGenerateRoute = async (data: { fromEventId: string; toEventId: string; mode: string }) => {
+  isGeneratingRoute.value = true;
+  try {
+    await routeStore.generateRoute(tripId, data.fromEventId, data.toEventId, data.mode);
+  } finally {
+    isGeneratingRoute.value = false;
   }
 };
 

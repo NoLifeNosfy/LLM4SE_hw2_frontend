@@ -33,6 +33,7 @@
           @add-route="emit('add-route', { fromEventId: event.id, toEventId: day.events[index + 1].id })"
           @edit-route="emit('edit-route', findRouteBetween(event, day.events[index + 1]))"
           @route-click="emit('route-click', findRouteBetween(event, day.events[index + 1]))"
+          @generate-route="emit('generate-route', { fromEventId: event.id, toEventId: day.events[index + 1].id, mode: $event })"
         />
       </template>
     </div>
@@ -53,7 +54,7 @@ const props = defineProps<{
   day: { dayIndex: number; events: Event[]; routes: Route[] };
 }>();
 
-const emit = defineEmits(['add-event', 'edit-event', 'add-route', 'edit-route', 'event-click', 'route-click']);
+const emit = defineEmits(['add-event', 'edit-event', 'add-route', 'edit-route', 'event-click', 'route-click', 'generate-route']);
 
 const isFolded = ref(false);
 const eventStore = useEventStore();

@@ -17,11 +17,11 @@ export interface RouteCreate {
     from_event_id: string;
     to_event_id: string;
     mode: string;
-    distance: number;
-    duration: number;
-    budget: number;
-    geometry: any;
-    details: string;
+    distance?: number;
+    duration?: number;
+    budget?: number;
+    geometry?: any;
+    details?: string;
 }
 
 export const getRoutes = (tripId: string) => {
@@ -38,4 +38,8 @@ export const updateRoute = (routeId: string, route: RouteCreate) => {
 
 export const deleteRoute = (routeId: string) => {
     return api.delete(`/api/routes/${routeId}`);
+};
+
+export const generateRoute = (tripId: string, fromEventId: string, toEventId: string, mode: string) => {
+    return api.get<Route>(`/api/trips/${tripId}/gen_route?start_id=${fromEventId}&end_id=${toEventId}&mode=${mode}`);
 };
