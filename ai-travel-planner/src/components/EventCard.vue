@@ -1,6 +1,6 @@
 <template>
   <div class="event-card" :style="{ backgroundColor: eventColor }">
-    <div class="event-header" @click="toggleFold">
+    <div class="event-header" @click="handleEventClick">
       <div class="event-time">
         <span>{{ formatTime(event.start_time) }}</span>
         <span>{{ formatTime(event.end_time) }}</span>
@@ -43,7 +43,7 @@ const props = defineProps<{
   eventColor: string;
 }>();
 
-const emit = defineEmits(['edit-event']);
+const emit = defineEmits(['edit-event', 'event-click']);
 
 const isFolded = ref(true);
 const locationStore = useLocationStore();
@@ -76,6 +76,11 @@ const handleDeleteEvent = async () => {
   } catch (error) {
     // catch cancellation
   }
+};
+
+const handleEventClick = () => {
+  toggleFold();
+  emit('event-click', props.event);
 };
 </script>
 

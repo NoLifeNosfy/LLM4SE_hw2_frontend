@@ -22,11 +22,19 @@
             @edit-event="openEditEventDialog"
             @add-route="openAddRouteDialog"
             @edit-route="openEditRouteDialog"
+            @event-click="handleEventClick"
+            @route-click="handleRouteClick"
           />
         </div>
       </div>
       <div class="right-panel">
-        <MapContainer v-if="isDataLoaded" :events="events" :locations="locations" />
+        <MapContainer 
+          ref="mapContainerRef" 
+          v-if="isDataLoaded" 
+          :events="events" 
+          :locations="locations" 
+          :routes="routes" 
+        />
         <div v-else class="map-placeholder">Loading Map...</div>
       </div>
     </div>
@@ -78,12 +86,14 @@ const editingRoute = ref<Route | undefined>(undefined);
 const fromEventId = ref<string | undefined>(undefined);
 const toEventId = ref<string | undefined>(undefined);
 
+const mapContainerRef = ref<InstanceType<typeof MapContainer> | null>(null);
+
 const trip = computed(() => tripStore.trips.find(t => t.id === tripId));
 const events = computed(() => eventStore.events);
 const routes = computed(() => routeStore.routes);
 const locations = computed(() => locationStore.locations);
 
-const isDataLoaded = computed(() => events.value.length > 0 && locations.value.length > 0);
+const isDataLoaded = computed(() => events.value.length > 0 && locations.value.length > 0 && routes.value.length > 0);
 
 const days = computed(() => {
   const grouped = events.value.reduce((acc, event) => {
@@ -157,6 +167,18 @@ const handleSaveRoute = async (routeData: RouteCreate) => {
     await routeStore.editRoute(editingRoute.value.id, routeData);
   } else {
     await routeStore.addRoute(tripId, routeData);
+  }
+};
+
+const handleEventClick = (event: Event) => {
+  if (mapContainerRef.value) {
+    mapContainerRef.value.centerOnEvent(event);
+  }
+};
+
+const handleRouteClick = (route: Route) => {
+  if (mapContainerRef.value) {
+    mapContainerRef.value.centerOnRoute(route);
   }
 };
 

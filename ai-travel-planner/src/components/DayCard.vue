@@ -21,12 +21,18 @@
     </div>
     <div v-if="!isFolded" class="events-container">
       <template v-for="(event, index) in day.events" :key="event.id">
-        <EventCard :event="event" :event-color="getEventColor(index)" @edit-event="emit('edit-event', event)" />
+        <EventCard 
+          :event="event" 
+          :event-color="getEventColor(index)" 
+          @edit-event="emit('edit-event', event)" 
+          @event-click="emit('event-click', event)" 
+        />
         <RouteCard 
           v-if="index < day.events.length - 1" 
           :route="findRouteBetween(event, day.events[index + 1])" 
           @add-route="emit('add-route', { fromEventId: event.id, toEventId: day.events[index + 1].id })"
           @edit-route="emit('edit-route', findRouteBetween(event, day.events[index + 1]))"
+          @route-click="emit('route-click', findRouteBetween(event, day.events[index + 1]))"
         />
       </template>
     </div>
@@ -47,7 +53,7 @@ const props = defineProps<{
   day: { dayIndex: number; events: Event[]; routes: Route[] };
 }>();
 
-const emit = defineEmits(['add-event', 'edit-event', 'add-route', 'edit-route']);
+const emit = defineEmits(['add-event', 'edit-event', 'add-route', 'edit-route', 'event-click', 'route-click']);
 
 const isFolded = ref(false);
 const eventStore = useEventStore();

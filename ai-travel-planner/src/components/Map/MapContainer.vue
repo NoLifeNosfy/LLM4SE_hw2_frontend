@@ -13,10 +13,12 @@
 import { nextTick, ref, watch } from 'vue';
 import type { Event } from '../../api/event';
 import type { Location } from '../../api/location';
+import { Route } from '../../api/route';
 
 const props = defineProps<{
   events: Event[];
   locations: Location[];
+  routes: Route[];
 }>();
 
 const center = ref({ lng: 116.404, lat: 39.915 });
@@ -44,7 +46,8 @@ const mapReady = async ({ BMap, map }) => {
 
   // 添加自定义 marker
   await nextTick();
-  renderCustomMarkers(BMap, map);
+  renderCustomMarkers();
+  renderRoutes();
 };
 
 const findFirstLocation = () => {
@@ -63,13 +66,10 @@ const findFirstLocation = () => {
 };
 
 // 渲染所有自定义圆形 marker
-// 渲染所有自定义 marker
 const renderCustomMarkers = () => {
   const map = mapInstance.value;
   const BMap = BMapRef.value;
   if (!map || !BMap) return;
-
-  map.clearOverlays();
 
   const events = props.events || [];
   const locations = props.locations || [];
@@ -79,6 +79,18 @@ const renderCustomMarkers = () => {
   for (const ev of events) {
     if (!dayGroups[ev.day_index]) dayGroups[ev.day_index] = [];
     dayGroups[ev.day_index].push(ev);
+  }
+
+  // 为每个 day_index 找到第一个和最后一个事件
+  const firstAndLastEvents: Record<number, { first: Event; last: Event }> = {};
+  for (const dayIndex in dayGroups) {
+    const dayEvents = dayGroups[dayIndex];
+    if (dayEvents.length > 0) {
+      firstAndLastEvents[dayIndex] = {
+        first: dayEvents[0],
+        last: dayEvents[dayEvents.length - 1],
+      };
+    }
   }
 
   events.forEach(ev => {
@@ -92,15 +104,17 @@ const renderCustomMarkers = () => {
     const colorSet = eventColorShades[(ev.day_index - 1) % eventColorShades.length];
     const color = colorSet[Math.min(indexInDay, colorSet.length - 1)];
 
+    const isFirst = firstAndLastEvents[ev.day_index]?.first.id === ev.id;
+    const isLast = firstAndLastEvents[ev.day_index]?.last.id === ev.id;
+
     const label = new BMap.Label(labelText, {
       position: point,
       offset: new BMap.Size(-12, -12),
     });
 
-    label.setStyle({
+    const style: any = {
       backgroundColor: color,
       color: '#fff',
-      border: '2px solid #333',
       borderRadius: '50%',
       fontWeight: 'bold',
       textAlign: 'center',
@@ -110,26 +124,150 @@ const renderCustomMarkers = () => {
       fontSize: '12px',
       boxShadow: '0 0 4px rgba(0,0,0,0.3)',
       cursor: 'pointer',
-    });
+    };
+
+    if (isFirst || isLast) {
+      style.border = '3px solid #666'; // Dark gray border for highlight
+      style.width = '28px';
+      style.height = '28px';
+      style.lineHeight = '28px';
+      style.offset = new BMap.Size(-14, -14);
+    } else {
+      style.border = '3px solid #CCC';
+    }
+
+    label.setStyle(style);
 
     map.addOverlay(label);
   });
 };
 
-// 如果 events/locations 后来才有数据，自动更新地图中心
+const renderRoutes = () => {
+  const map = mapInstance.value;
+  const BMap = BMapRef.value;
+  if (!map || !BMap) return;
+
+  const routes = props.routes || [];
+  const events = props.events || [];
+  const locations = props.locations || [];
+
+  routes.forEach(route => {
+    let points: any[] = [];
+
+    if (route.geometry && route.geometry.length > 1) {
+      // 有完整路径：用 geometry 画折线
+      points = route.geometry.map(p => new BMap.Point(p.lng, p.lat));
+    } else {
+      // 无 geometry：回退为起点终点虚线
+      const fromEvent = events.find(e => e.id === route.from_event_id);
+      const toEvent = events.find(e => e.id === route.to_event_id);
+      if (!fromEvent || !toEvent) return;
+
+      const fromLocation = locations.find(l => l.id === fromEvent.location_id);
+      const toLocation = locations.find(l => l.id === toEvent.location_id);
+      if (!fromLocation || !toLocation) return;
+
+      points = [
+        new BMap.Point(fromLocation.lng, fromLocation.lat),
+        new BMap.Point(toLocation.lng, toLocation.lat),
+      ];
+    }
+
+    // 箭头样式
+    const arrow = new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_OPEN_ARROW, {
+      scale: 0.6,
+      strokeColor: '#fff',
+      strokeWeight: 2,
+    });
+    const icons = [new BMap.IconSequence(arrow, '10', '30')];
+
+    //  选中状态样式
+    const isSelected = selectedRouteId.value === route.id;
+    const hasGeometry = !!(route.geometry && route.geometry.length > 1);
+
+    // ✅ 基础样式：绿色路线
+    const strokeColor = isSelected ? '#FF5722' : '#4CAF50';
+    const strokeOpacity = hasGeometry ? 0.9 : 0.4; // 无 geometry 更淡
+    const strokeStyle = hasGeometry ? 'solid' : 'dashed'; // 无 geometry 虚线
+    const strokeWeight = isSelected ? 10 : 6;
+
+    const polyline = new BMap.Polyline(points, {
+      strokeColor,
+      strokeWeight,
+      strokeOpacity,
+      strokeStyle,
+      icons: hasGeometry ? icons : [], // 没 geometry 的不加箭头
+    });
+
+    map.addOverlay(polyline);
+  });
+};
+
+
+const selectedEventId = ref<string | null>(null);
+
+const centerOnEvent = (event: Event) => {
+  const location = props.locations.find(l => l.id === event.location_id);
+  if (location && mapInstance.value) {
+    selectedEventId.value = event.id;
+    mapInstance.value.centerAndZoom(new BMapRef.value.Point(location.lng, location.lat), 15);
+    reRenderMap();
+  }
+};
+
+const selectedRouteId = ref<string | null>(null);
+const selectedRouteEventIds = ref<{ from: string; to: string } | null>(null);
+
+const centerOnRoute = (route: Route) => {
+  const fromEvent = props.events.find(e => e.id === route.from_event_id);
+  const toEvent = props.events.find(e => e.id === route.to_event_id);
+
+  if (!fromEvent || !toEvent) return;
+
+  const fromLocation = props.locations.find(l => l.id === fromEvent.location_id);
+  const toLocation = props.locations.find(l => l.id === toEvent.location_id);
+
+  if (fromLocation && toLocation && mapInstance.value) {
+    selectedRouteId.value = route.id;
+    selectedRouteEventIds.value = { from: route.from_event_id, to: route.to_event_id };
+    const points = [
+      new BMapRef.value.Point(fromLocation.lng, fromLocation.lat),
+      new BMapRef.value.Point(toLocation.lng, toLocation.lat),
+    ];
+    mapInstance.value.setViewport(points);
+    reRenderMap();
+  }
+};
+
+const reRenderMap = () => {
+  if (mapInstance.value && BMapRef.value) {
+    mapInstance.value.clearOverlays();
+    renderCustomMarkers();
+    renderRoutes();
+  }
+};
+
+defineExpose({
+  centerOnEvent,
+  centerOnRoute,
+});
+
+// 如果 events/locations/routes 后来才有数据，自动更新地图中心
 watch(
-  () => [props.events, props.locations],
+  () => [props.events, props.locations, props.routes],
   () => {
     const firstLocation = findFirstLocation();
     if (firstLocation && mapInstance.value) {
       mapInstance.value.centerAndZoom(
-        new BMap.Point(firstLocation.lng, firstLocation.lat),
+        new BMapRef.value.Point(firstLocation.lng, firstLocation.lat),
         15
       );
     }
 
     if (mapInstance.value && BMapRef.value) {
+      mapInstance.value.clearOverlays();
       renderCustomMarkers();
+      renderRoutes();
     }
   },
   { deep: true, immediate: true }

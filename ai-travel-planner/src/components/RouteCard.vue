@@ -1,5 +1,5 @@
 <template>
-  <div class="route-card">
+  <div class="route-card" @click="handleRouteClick">
     <div v-if="route" class="route-details">
       <div class="route-arrow">↓</div>
       <div class="route-info">
@@ -35,7 +35,7 @@ const props = defineProps<{
   route?: Route;
 }>();
 
-const emit = defineEmits(['add-route', 'edit-route']);
+const emit = defineEmits(['add-route', 'edit-route', 'route-click']);
 
 const routeStore = useRouteStore();
 
@@ -63,6 +63,12 @@ const handleDeleteRoute = async () => {
     } catch (error) {
       // catch cancellation
     }
+  }
+};
+
+const handleRouteClick = () => {
+  if (props.route) {
+    emit('route-click', props.route);
   }
 };
 
