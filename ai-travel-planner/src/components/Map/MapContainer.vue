@@ -186,7 +186,7 @@ const renderRoutes = () => {
     const hasGeometry = !!(route.geometry && route.geometry.length > 1);
 
     // ✅ 基础样式：绿色路线
-    const strokeColor = isSelected ? '#FF5722' : '#4CAF50';
+    const strokeColor = isSelected ? '#FF5722' : '#008B45';
     const strokeOpacity = hasGeometry ? 0.9 : 0.4; // 无 geometry 更淡
     const strokeStyle = hasGeometry ? 'solid' : 'dashed'; // 无 geometry 虚线
     const strokeWeight = isSelected ? 10 : 6;
@@ -210,6 +210,8 @@ const centerOnEvent = (event: Event) => {
   const location = props.locations.find(l => l.id === event.location_id);
   if (location && mapInstance.value) {
     selectedEventId.value = event.id;
+    selectedRouteId.value = null; // Clear selected route
+    selectedRouteEventIds.value = null;
     mapInstance.value.centerAndZoom(new BMapRef.value.Point(location.lng, location.lat), 15);
     reRenderMap();
   }
@@ -230,6 +232,7 @@ const centerOnRoute = (route: Route) => {
   if (fromLocation && toLocation && mapInstance.value) {
     selectedRouteId.value = route.id;
     selectedRouteEventIds.value = { from: route.from_event_id, to: route.to_event_id };
+    selectedEventId.value = null; // Clear selected event
     const points = [
       new BMapRef.value.Point(fromLocation.lng, fromLocation.lat),
       new BMapRef.value.Point(toLocation.lng, toLocation.lat),
@@ -264,11 +267,7 @@ watch(
       );
     }
 
-    if (mapInstance.value && BMapRef.value) {
-      mapInstance.value.clearOverlays();
-      renderCustomMarkers();
-      renderRoutes();
-    }
+    reRenderMap();
   },
   { deep: true, immediate: true }
 );
