@@ -54,6 +54,8 @@
       @save="handleSaveRoute"
     />
   </div>
+  <AIChatButton />
+  <AIChatWindow />
 </template>
 
 <script setup lang="ts">
@@ -71,6 +73,8 @@ import type { Event, EventCreate } from '../api/event';
 import type { Route, RouteCreate } from '../api/route';
 import type { Location } from '../api/location';
 import MapContainer from '../components/Map/MapContainer.vue';
+import AIChatButton from '../components/AIChat/AIChatButton.vue';
+import AIChatWindow from '../components/AIChat/AIChatWindow.vue';
 
 const route = useRoute();
 const tripStore = useTripStore();
@@ -97,7 +101,7 @@ const events = computed(() => eventStore.events);
 const routes = computed(() => routeStore.routes);
 const locations = computed(() => locationStore.locations);
 
-const isDataLoaded = computed(() => events.value.length > 0 && locations.value.length > 0 && routes.value.length > 0);
+const isDataLoaded = computed(() => events.value.length > 0 && locations.value.length > 0 );
 
 const days = computed(() => {
   const grouped = events.value.reduce((acc, event) => {

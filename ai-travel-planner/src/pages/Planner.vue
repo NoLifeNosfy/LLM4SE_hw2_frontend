@@ -23,6 +23,8 @@
       </div>
     </el-card>
   </div>
+  <AIChatButton />
+  <AIChatWindow />
 </template>
 
 <script setup lang="ts">
@@ -33,6 +35,8 @@ import { Plus, Delete } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import type { Trip } from '../api/trip';
+import AIChatButton from '../components/AIChat/AIChatButton.vue';
+import AIChatWindow from '../components/AIChat/AIChatWindow.vue';
 
 const userStore = useUserStore();
 const tripStore = useTripStore();
