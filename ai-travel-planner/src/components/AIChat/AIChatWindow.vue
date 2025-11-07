@@ -9,10 +9,13 @@
         <p>{{ msg.content }}</p>
       </div>
     </div>
+    <div v-if="isProcessing" class="status-folder">
+      <div class="spinner"></div>
+      <span class="status-message">{{ statusMessage }}</span>
+    </div>
     <div class="input-area">
       <input v-model="userInput" @keyup.enter="sendMessage" placeholder="Ask me anything about your trip..." :disabled="isProcessing" />
       <button @click="sendMessage" :disabled="isProcessing">Send</button>
-      <div v-if="isProcessing" class="processing-indicator">Processing...</div>
     </div>
   </div>
 </template>
@@ -25,10 +28,11 @@ import { sendMessage as sendApiMessage } from '../../api/agent';
 const agentStore = useAgentStore();
 const userInput = ref('');
 const messagesContainer = ref<HTMLElement | null>(null);
-const isProcessing = ref(false);
 
 const isWindowVisible = computed(() => agentStore.isWindowVisible);
 const messages = computed(() => agentStore.messages);
+const isProcessing = computed(() => agentStore.isProcessing);
+const statusMessage = computed(() => agentStore.statusMessage);
 
 const closeChat = () => {
   agentStore.toggleChatWindow();
@@ -41,17 +45,12 @@ const sendMessage = async () => {
   userInput.value = '';
   
   agentStore.addUserMessage(message);
-  isProcessing.value = true;
 
   try {
-    await sendApiMessage(message, (event) => {
-      agentStore.addAssistantMessage(event);
-    });
+    await sendApiMessage(message);
   } catch (error) {
     console.error('Failed to send message:', error);
-    agentStore.addAssistantMessage({ type: 'error', data: { message: 'Failed to get response from the assistant.' } });
-  } finally {
-    isProcessing.value = false;
+    agentStore.handleStreamEvent({ type: 'error', data: { message: 'Failed to get response from the assistant.' } });
   }
 };
 
@@ -131,6 +130,37 @@ watch(messages, scrollToBottom, { deep: true });
   align-self: flex-start;
 }
 
+.status-folder {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.status-message {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #6c757d;
+  font-size: 14px;
+}
+
 .input-area {
   display: flex;
   align-items: center;
@@ -167,11 +197,5 @@ watch(messages, scrollToBottom, { deep: true });
 
 .input-area button:hover {
   background-color: #0056b3;
-}
-
-.processing-indicator {
-  margin-left: 10px;
-  font-style: italic;
-  color: #666;
 }
 </style>

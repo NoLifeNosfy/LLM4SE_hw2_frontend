@@ -9,16 +9,27 @@ interface Message {
 interface AgentState {
   isWindowVisible: boolean;
   messages: Message[];
+  isProcessing: boolean;
+  statusMessage: string | null;
 }
 
 export const useAgentStore = defineStore('agent', {
   state: (): AgentState => ({
     isWindowVisible: false,
     messages: [],
+    isProcessing: false,
+    statusMessage: null,
   }),
   actions: {
     toggleChatWindow() {
       this.isWindowVisible = !this.isWindowVisible;
+    },
+    startProcessing() {
+      this.isProcessing = true;
+    },
+    stopProcessing() {
+      this.isProcessing = false;
+      this.statusMessage = null;
     },
     addMessage(role: 'user' | 'assistant', content: string) {
       this.messages.push({ id: Date.now(), role, content });
@@ -26,34 +37,44 @@ export const useAgentStore = defineStore('agent', {
     addUserMessage(content: string) {
       this.addMessage('user', content);
     },
-    addAssistantMessage(event: any) {
-      let content = '';
+    handleStreamEvent(event: any) {
+      let status = null;
+      let isFinal = false;
+
       switch (event.type) {
         case 'intent':
-          content = `Intent: ${event.data.category} (${event.data.function_count} functions)`;
+          status = `Understood intent: ${event.data.category}`;
           break;
         case 'status':
-          content = `Status: ${event.data.message}`;
-          break;
         case 'progress':
-          content = `Progress: ${event.data.message}`;
+          status = event.data.message;
           break;
         case 'function_call':
-          content = `Calling: ${event.data.name}(${JSON.stringify(event.data.args)})`;
+          status = `Thinking: using tool ${event.data.name}...`;
           break;
         case 'function_result':
-          content = `Result from ${event.data.name}: ${JSON.stringify(event.data.result)}`;
+          status = `Received result from ${event.data.name}`;
           break;
         case 'result':
-          content = event.data.message;
+          this.addMessage('assistant', event.data.message);
+          isFinal = true;
           break;
         case 'error':
-          content = `Error: ${event.data.message}`;
+          this.addMessage('assistant', `Error: ${event.data.message}`);
+          isFinal = true;
           break;
         default:
-          content = 'Received an unknown message type.';
+          this.addMessage('assistant', 'Received an unknown message type.');
+          isFinal = true;
       }
-      this.addMessage('assistant', content);
+
+      if (status) {
+        this.statusMessage = status;
+      }
+
+      if (isFinal) {
+        this.stopProcessing();
+      }
     },
   },
 });

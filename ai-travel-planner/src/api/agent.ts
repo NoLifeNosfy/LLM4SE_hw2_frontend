@@ -1,16 +1,20 @@
 import { useUserStore } from '../store/userStore';
 import { useTripStore } from '../store/tripStore';
+import { useAgentStore } from '../store/agentStore';
 
 const API_URL = 'http://localhost:8000/api/agent/stream';
 
-export const sendMessage = async (message: string, onMessage: (data: any) => void) => {
+export const sendMessage = async (message: string) => {
   const userStore = useUserStore();
   const tripStore = useTripStore();
+  const agentStore = useAgentStore();
 
   const token = userStore.token;
   if (!token) {
     throw new Error('Authentication token not found.');
   }
+
+  agentStore.startProcessing();
 
   const response = await fetch(API_URL, {
     method: 'POST',
@@ -34,7 +38,10 @@ export const sendMessage = async (message: string, onMessage: (data: any) => voi
   try {
     while (true) {
       const { done, value } = await reader.read();
-      if (done) break;
+      if (done) {
+        agentStore.stopProcessing();
+        break;
+      }
 
       const chunk = decoder.decode(value, { stream: true });
       const lines = chunk.split('\n\n').filter(line => line.trim() !== '');
@@ -44,7 +51,7 @@ export const sendMessage = async (message: string, onMessage: (data: any) => voi
           const jsonStr = line.substring(5);
           try {
             const data = JSON.parse(jsonStr);
-            onMessage(data);
+            agentStore.handleStreamEvent(data);
           } catch (e) {
             console.error('Failed to parse SSE data:', jsonStr);
           }
