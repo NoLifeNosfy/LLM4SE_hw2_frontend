@@ -18,8 +18,12 @@ export interface Trip {
 export const useTripStore = defineStore('trip', {
   state: () => ({
     trips: [] as Trip[],
+    currentTrip: null as Trip | null,
   }),
   actions: {
+    setCurrentTrip(trip: Trip | null) {
+      this.currentTrip = trip;
+    },
     async fetchTrips() {
       try {
         const response = await getTrips();
@@ -52,14 +56,17 @@ export const useTripStore = defineStore('trip', {
       try {
         const response = await getTrip(id);
         const trip = response.data;
+        this.currentTrip = trip;
         const index = this.trips.findIndex(t => t.id === id);
         if (index !== -1) {
           this.trips[index] = trip;
         } else {
           this.trips.push(trip);
         }
+        return trip;
       } catch (error: any) {
         console.error('Failed to fetch trip:', error);
+        this.currentTrip = null;
         throw error.response?.data || error;
       }
     },

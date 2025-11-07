@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useTripStore } from '../store/tripStore';
 import { useEventStore } from '../store/eventStore';
@@ -96,7 +96,7 @@ const isGeneratingRoute = ref(false);
 
 const mapContainerRef = ref<InstanceType<typeof MapContainer> | null>(null);
 
-const trip = computed(() => tripStore.trips.find(t => t.id === tripId));
+const trip = computed(() => tripStore.currentTrip);
 const events = computed(() => eventStore.events);
 const routes = computed(() => routeStore.routes);
 const locations = computed(() => locationStore.locations);
@@ -209,6 +209,10 @@ onMounted(async () => {
   await eventStore.fetchEvents(tripId);
   await routeStore.fetchRoutes(tripId);
   await locationStore.fetchLocations();
+});
+
+onUnmounted(() => {
+  tripStore.setCurrentTrip(null);
 });
 </script>
 

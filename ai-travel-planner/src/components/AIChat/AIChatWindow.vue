@@ -10,8 +10,9 @@
       </div>
     </div>
     <div class="input-area">
-      <input v-model="userInput" @keyup.enter="sendMessage" placeholder="Ask me anything about your trip..." />
-      <button @click="sendMessage">Send</button>
+      <input v-model="userInput" @keyup.enter="sendMessage" placeholder="Ask me anything about your trip..." :disabled="isProcessing" />
+      <button @click="sendMessage" :disabled="isProcessing">Send</button>
+      <div v-if="isProcessing" class="processing-indicator">Processing...</div>
     </div>
   </div>
 </template>
@@ -24,6 +25,7 @@ import { sendMessage as sendApiMessage } from '../../api/agent';
 const agentStore = useAgentStore();
 const userInput = ref('');
 const messagesContainer = ref<HTMLElement | null>(null);
+const isProcessing = ref(false);
 
 const isWindowVisible = computed(() => agentStore.isWindowVisible);
 const messages = computed(() => agentStore.messages);
@@ -33,12 +35,13 @@ const closeChat = () => {
 };
 
 const sendMessage = async () => {
-  if (userInput.value.trim() === '') return;
+  if (userInput.value.trim() === '' || isProcessing.value) return;
 
   const message = userInput.value;
   userInput.value = '';
   
   agentStore.addUserMessage(message);
+  isProcessing.value = true;
 
   try {
     await sendApiMessage(message, (event) => {
@@ -47,6 +50,8 @@ const sendMessage = async () => {
   } catch (error) {
     console.error('Failed to send message:', error);
     agentStore.addAssistantMessage({ type: 'error', data: { message: 'Failed to get response from the assistant.' } });
+  } finally {
+    isProcessing.value = false;
   }
 };
 
@@ -66,8 +71,9 @@ watch(messages, scrollToBottom, { deep: true });
   position: fixed;
   bottom: 100px;
   right: 30px;
-  width: 350px;
-  height: 500px;
+  width: 700px;
+  height: 1000px;
+  max-height: 80vh;
   background-color: white;
   border-radius: 15px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -127,6 +133,7 @@ watch(messages, scrollToBottom, { deep: true });
 
 .input-area {
   display: flex;
+  align-items: center;
   padding: 10px;
   border-top: 1px solid #ccc;
 }
@@ -139,6 +146,10 @@ watch(messages, scrollToBottom, { deep: true });
   outline: none;
 }
 
+.input-area input:disabled {
+  background-color: #f9f9f9;
+}
+
 .input-area button {
   margin-left: 10px;
   padding: 8px 15px;
@@ -149,7 +160,18 @@ watch(messages, scrollToBottom, { deep: true });
   cursor: pointer;
 }
 
+.input-area button:disabled {
+  background-color: #a0cfff;
+  cursor: not-allowed;
+}
+
 .input-area button:hover {
   background-color: #0056b3;
+}
+
+.processing-indicator {
+  margin-left: 10px;
+  font-style: italic;
+  color: #666;
 }
 </style>
