@@ -40,7 +40,7 @@
         <div v-else class="map-placeholder">Loading Map...</div>
       </div>
     </div>
-    <AddEventForm 
+    <EventCreationWizard 
       v-model="isDialogVisible" 
       :event="editingEvent" 
       :day-index="currentDayIndex" 
@@ -65,10 +65,11 @@ import { useRouteStore } from '../store/routeStore';
 import { useLocationStore } from '../store/locationStore';
 import { Plus, ArrowDown } from '@element-plus/icons-vue';
 import DayCard from '../components/DayCard.vue';
-import AddEventForm from '../components/AddEventForm.vue';
+import EventCreationWizard from '../components/EventCreationWizard.vue';
 import AddRouteForm from '../components/AddRouteForm.vue';
 import type { Event, EventCreate } from '../api/event';
 import type { Route, RouteCreate } from '../api/route';
+import type { Location } from '../api/location';
 import MapContainer from '../components/Map/MapContainer.vue';
 
 const route = useRoute();
@@ -143,7 +144,12 @@ const openEditEventDialog = (event: Event) => {
   isDialogVisible.value = true;
 };
 
-const handleSaveEvent = async (eventData: EventCreate) => {
+const handleSaveEvent = async (eventData: EventCreate & { location?: Location }) => {
+  if (eventData.location) {
+    const upsertedLocation = await locationStore.upsertLocation(eventData.location);
+    eventData.location_id = upsertedLocation.id;
+  }
+
   if (editingEvent.value) {
     await eventStore.editEvent(editingEvent.value.id, eventData);
   } else {

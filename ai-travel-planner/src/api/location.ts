@@ -14,3 +14,11 @@ export interface Location {
 export const getLocations = () => {
     return api.get<Location[]>('/api/locations');
 };
+
+export const searchLocations = (query: string, region: string) => {
+    return api.get<Location[]>(`/api/map/search_locations?query=${query}&region=${region}`);
+};
+
+export const upsertLocation = (location: Location) => {
+    return api.post<Location>('/api/locations/upsert', location);
+};
