@@ -4,6 +4,12 @@
       <div class="day-indicator">
         <span class="day-number">Day {{ day.dayIndex }}</span>
       </div>
+      <div class="day-summary">
+        <div>Today's Budget: <span style="color: green;">{{ day.dailyBudget }}</span></div>
+        <div>Today's Expense: <span style="color: red;">{{ day.dailyExpense }}</span></div>
+        <div>Total Budget: <span style="color: green;">{{ day.cumulativeBudget }}</span></div>
+        <div>Total Expense: <span style="color: red;">{{ day.cumulativeExpense }}</span></div>
+      </div>
       <div v-if="isFolded" class="folded-summary">{{ foldedSummary }}</div>
       <div class="day-actions">
         <el-dropdown>
@@ -51,7 +57,15 @@ import { useEventStore } from '../store/eventStore';
 import { ElMessageBox } from 'element-plus';
 
 const props = defineProps<{ 
-  day: { dayIndex: number; events: Event[]; routes: Route[] };
+  day: { 
+    dayIndex: number; 
+    events: Event[]; 
+    routes: Route[];
+    dailyBudget: number;
+    dailyExpense: number;
+    cumulativeBudget: number;
+    cumulativeExpense: number;
+  };
 }>();
 
 const emit = defineEmits(['add-event', 'edit-event', 'add-route', 'edit-route', 'event-click', 'route-click', 'generate-route']);
@@ -133,6 +147,14 @@ const handleDeleteDay = async () => {
 .day-number {
   font-weight: bold;
   font-size: 1.2em;
+}
+
+.day-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-right: 15px;
+  font-size: 0.8em;
 }
 
 .folded-summary {

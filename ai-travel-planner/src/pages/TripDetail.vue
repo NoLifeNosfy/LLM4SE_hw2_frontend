@@ -129,7 +129,26 @@ const days = computed(() => {
     });
   }
 
-  return Object.values(grouped).sort((a, b) => a.dayIndex - b.dayIndex);
+  const sortedDays = Object.values(grouped).sort((a, b) => a.dayIndex - b.dayIndex);
+
+  let cumulativeBudget = 0;
+  let cumulativeExpense = 0;
+
+  return sortedDays.map(day => {
+    const dailyBudget = day.events.reduce((sum, event) => sum + (event.budget || 0), 0);
+    const dailyExpense = day.events.reduce((sum, event) => sum + (event.expense || 0), 0);
+
+    cumulativeBudget += dailyBudget;
+    cumulativeExpense += dailyExpense;
+
+    return {
+      ...day,
+      dailyBudget,
+      dailyExpense,
+      cumulativeBudget,
+      cumulativeExpense
+    };
+  });
 });
 
 const handleAddDay = () => {

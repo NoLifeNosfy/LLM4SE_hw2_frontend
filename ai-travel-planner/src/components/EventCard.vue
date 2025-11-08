@@ -9,6 +9,10 @@
         <span>{{ event.title.charAt(0) }}</span>
       </div>
       <div class="event-location">{{ locationName }}</div>
+      <div class="event-cost">
+        <span style="color: green;">+{{ event.budget || 0 }}</span> /
+        <span style="color: red;">-{{ event.expense || 0 }}</span>
+      </div>
       <el-dropdown>
         <span class="el-dropdown-link" @click.stop>
           <el-icon class="el-icon--right"><more-filled /></el-icon>
@@ -24,7 +28,11 @@
     <div v-if="!isFolded" class="event-body">
       <p><strong>Title:</strong> {{ event.title }}</p>
       <p><strong>Type:</strong> {{ event.type }}</p>
-      <p><strong>Budget:</strong> {{ event.budget }}</p>
+      <p>
+        <strong>Budget / Expense:  </strong>
+        <span :style="{ color: event.budget ? 'green' : 'inherit' }">{{ event.budget || 0 }}</span> /
+        <span :style="{ color: event.expense ? 'red' : 'inherit' }">{{ event.expense || 'Not set' }}</span>
+      </p>
       <p><strong>Details:</strong> {{ event.details?.description || 'No details provided.' }}</p>
     </div>
   </div>
@@ -120,6 +128,12 @@ const handleEventClick = () => {
 .event-location {
   flex-grow: 1;
   font-weight: 500;
+}
+
+.event-cost {
+  margin-right: 15px;
+  font-size: 0.9em;
+  white-space: nowrap;
 }
 
 .event-body {

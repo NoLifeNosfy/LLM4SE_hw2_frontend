@@ -25,6 +25,7 @@ export interface EventCreate {
     details: any;
     day_index: number;
     location_id: string | null;
+    expense?: number;
 }
 
 export const getEvents = (tripId: string) => {

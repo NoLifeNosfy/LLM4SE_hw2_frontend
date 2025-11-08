@@ -28,6 +28,9 @@
         <el-form-item label="Budget">
           <el-input-number v-model="form.budget" :min="0"></el-input-number>
         </el-form-item>
+        <el-form-item label="Expense">
+          <el-input-number v-model="form.expense" :min="0"></el-input-number>
+        </el-form-item>
         <el-form-item label="Description">
           <el-input type="textarea" v-model="form.details.description"></el-input>
         </el-form-item>
@@ -65,19 +68,20 @@ const emit = defineEmits(['update:modelValue', 'save']);
 const dialogVisible = ref(props.modelValue);
 const activeStep = ref(0);
 
-const initialForm: EventCreate & { location?: Location } = {
+const initialForm: EventCreate & { location?: Location; expense?: number } = {
   title: '',
   type: '',
   start_time: '',
   end_time: '',
   budget: 0,
+  expense: 0,
   details: { description: '' },
   day_index: props.dayIndex,
   location_id: '',
   location: undefined,
 };
 
-const form = reactive<EventCreate & { location?: Location }>({ ...initialForm });
+const form = reactive<EventCreate & { location?: Location; expense?: number }>({ ...initialForm });
 
 watch(() => props.modelValue, (newVal) => {
   dialogVisible.value = newVal;
