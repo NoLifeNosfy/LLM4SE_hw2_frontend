@@ -3,9 +3,6 @@
     <header class="hero-section">
       <h1>AI Travel Planner</h1>
       <p>Your intelligent guide to seamless travel planning.</p>
-      <el-button type="primary" size="large" @click="goToPlanner">
-        Start Planning
-      </el-button>
       <el-button size="large" @click="goToLogin">
         Login
       </el-button>

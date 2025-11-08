@@ -14,7 +14,7 @@ app.use(router);
 app.use(ElementPlus);
 
 app.use(BaiduMap, {
-  ak: import.meta.env.VITE_BAIDU_MAP_AK,
+  ak: 'TFJmvlIBBwWbAm4vWJCC2Swklw9izfRq',
 });
 
 app.mount('#app');
