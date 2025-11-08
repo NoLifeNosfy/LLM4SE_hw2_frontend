@@ -2,8 +2,9 @@ import { useUserStore } from '../store/userStore';
 import { useTripStore } from '../store/tripStore';
 import { useAgentStore } from '../store/agentStore';
 
-const API_URL = 'http://localhost:8000/api/agent/stream';
-const VOP_URL = 'http://localhost:8000/api/vop';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+const API_URL = API_BASE_URL + '/api/agent/stream';
+const VOP_URL = API_BASE_URL + '/api/vop';
 
 export const uploadAudio = async (audioBlob: Blob): Promise<string> => {
   const userStore = useUserStore();
