@@ -3,6 +3,44 @@ import { useTripStore } from '../store/tripStore';
 import { useAgentStore } from '../store/agentStore';
 
 const API_URL = 'http://localhost:8000/api/agent/stream';
+const VOP_URL = 'http://localhost:8000/api/vop';
+
+export const uploadAudio = async (audioBlob: Blob): Promise<string> => {
+  const userStore = useUserStore();
+  const token = userStore.token;
+  if (!token) {
+    throw new Error('Authentication token not found.');
+  }
+
+  const formData = new FormData();
+  formData.append('file', audioBlob, 'recording.wav');
+
+  const response = await fetch(VOP_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Audio upload failed with status: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  // WORKAROUND: If backend sends a plain string instead of a JSON object, treat it as a success.
+  if (typeof data === 'string') {
+    return data;
+  }
+
+  if (data.err_no === 0 && data.result.length > 0) {
+    return data.result[0];
+  } else {
+    console.error('Backend transcription failed. Response data:', data);
+    throw new Error(data.err_msg || 'Failed to transcribe audio.');
+  }
+};
 
 export const sendMessage = async (message: string) => {
   const userStore = useUserStore();

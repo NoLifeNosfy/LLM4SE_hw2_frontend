@@ -14,8 +14,11 @@
       <span class="status-message">{{ statusMessage }}</span>
     </div>
     <div class="input-area">
-      <input v-model="userInput" @keyup.enter="sendMessage" placeholder="Ask me anything about your trip..." :disabled="isProcessing" />
-      <button @click="sendMessage" :disabled="isProcessing">Send</button>
+      <input v-model="userInput" @keyup.enter="sendMessage" placeholder="Ask me anything about your trip..." :disabled="isProcessing || isTranscribing" />
+      <button @click="toggleRecording" :disabled="isProcessing || isTranscribing" class="voice-btn">
+        {{ isRecording ? '🛑' : '🎤' }}
+      </button>
+      <button @click="sendMessage" :disabled="isProcessing || isTranscribing">Send</button>
     </div>
   </div>
 </template>
@@ -23,10 +26,12 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, watch } from 'vue';
 import { useAgentStore } from '../../store/agentStore';
-import { sendMessage as sendApiMessage } from '../../api/agent';
+import { sendMessage as sendApiMessage, uploadAudio } from '../../api/agent';
+import { startRecording, stopRecording as stopRecordingUtil, isRecording } from '../../utils/audio';
 
 const agentStore = useAgentStore();
 const userInput = ref('');
+const isTranscribing = ref(false);
 const messagesContainer = ref<HTMLElement | null>(null);
 
 const isWindowVisible = computed(() => agentStore.isWindowVisible);
@@ -54,6 +59,30 @@ const sendMessage = async () => {
   }
 };
 
+const toggleRecording = async () => {
+  if (isRecording.value) {
+    isTranscribing.value = true;
+    try {
+      const audioBlob = await stopRecordingUtil();
+      const transcribedText = await uploadAudio(audioBlob);
+      console.log('Transcribed Text:', transcribedText);
+      userInput.value = transcribedText;
+    } catch (error) {
+      console.error('Error during recording or transcription:', error);
+      // Optionally, show an error message to the user
+    } finally {
+      isTranscribing.value = false;
+    }
+  } else {
+    try {
+      await startRecording();
+    } catch (error) {
+      console.error('Failed to start recording:', error);
+      // Optionally, show an error message to the user
+    }
+  }
+};
+  
 const scrollToBottom = () => {
   nextTick(() => {
     if (messagesContainer.value) {
@@ -197,5 +226,10 @@ watch(messages, scrollToBottom, { deep: true });
 
 .input-area button:hover {
   background-color: #0056b3;
+}
+
+.voice-btn {
+  padding: 8px 12px;
+  font-size: 16px;
 }
 </style>
