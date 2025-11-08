@@ -9,9 +9,9 @@
         <p>{{ msg.content }}</p>
       </div>
     </div>
-    <div v-if="isProcessing" class="status-folder">
+    <div v-if="isProcessing || isTranscribing" class="status-folder">
       <div class="spinner"></div>
-      <span class="status-message">{{ statusMessage }}</span>
+      <span class="status-message">{{ isTranscribing ? 'Transcribing audio...' : statusMessage }}</span>
     </div>
     <div class="input-area">
       <input v-model="userInput" @keyup.enter="sendMessage" placeholder="Ask me anything about your trip..." :disabled="isProcessing || isTranscribing" />
